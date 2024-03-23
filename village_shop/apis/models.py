@@ -1,6 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import User
 
+def product_image_upload_path(instance, filename):
+    product_id = instance.id or 'default'
+    return f"product/{product_id}/product_image/{filename}"
+
 class Tag(models.Model):
     name = models.CharField(max_length=100, unique=True)
 
@@ -12,6 +16,10 @@ class Product(models.Model):
     description = models.TextField()
     price = models.DecimalField(max_digits=10, decimal_places=2)
     tag = models.ForeignKey(Tag, on_delete=models.CASCADE, default=1)  # Default tag ID
+    image = models.ImageField(
+        upload_to=product_image_upload_path,
+        null=True, blank=True,
+    )
 
     def __str__(self):
         return self.name
