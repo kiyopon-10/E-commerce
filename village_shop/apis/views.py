@@ -75,31 +75,31 @@ class ProductSearchAPIView(APIView):
 
         return Response(data)
 
-class ProductListView(APIView):
+# class ProductListView(APIView):
     
-    def get(self, request, format=None):
-        keyword = request.query_params.get('keyword', None)
-        price = request.query_params.get('price')
+#     def get(self, request, format=None):
+#         keyword = request.query_params.get('keyword', None)
+#         price = request.query_params.get('price')
         
-        if keyword:
-            products_by_tag = Product.objects.filter(tag__name__icontains=keyword)
-            products_by_name = Product.objects.filter(name__icontains=keyword)
-            products = products_by_tag | products_by_name
+#         if keyword:
+#             products_by_tag = Product.objects.filter(tag__name__icontains=keyword)
+#             products_by_name = Product.objects.filter(name__icontains=keyword)
+#             products = products_by_tag | products_by_name
             
-            if price:
-                products = products.filter(price__lte=price)
+#             if price:
+#                 products = products.filter(price__lte=price)
             
-            if not products.exists():
-                return Response([])
+#             if not products.exists():
+#                 return Response([])
             
-        else:
-            products = Product.objects.all()
+#         else:
+#             products = Product.objects.all()
             
-            if price:
-                products = products.filter(price__lte=price)
+#             if price:
+#                 products = products.filter(price__lte=price)
 
-        serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data)
+#         serializer = ProductSerializer(products, many=True)
+#         return Response(serializer.data)
     
 
 class ProductDetailView(APIView):
