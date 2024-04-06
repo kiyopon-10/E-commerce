@@ -9,8 +9,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 
 from django.contrib.auth.models import User
-from .models import Product, Tag, Cart, CartItem
-from .serializers import ProductSerializer, CartItemSerializer
+from .models import Product, Tag, Cart, CartItem, Shop
+from .serializers import ProductSerializer, CartItemSerializer, ShopSerializer
 
 class UserCartItemsView(APIView):
     permission_classes = [IsAuthenticated]
@@ -51,6 +51,29 @@ class AddToCartView(APIView):
     
     
 #--------------------------------------------------------------------------------------------------------------------------------
+
+class ProductSearchAPIView(APIView):
+    def get(self, request):
+        keyword = request.query_params.get('keyword', '')
+        price = request.query_params.get('price', None)
+
+        # Get all shops
+        shops = Shop.objects.prefetch_related('products').all()
+
+        # Serialize the shops along with their products
+        data = []
+        for shop in shops:
+            # Check if the shop has any products that match the search criteria
+            filtered_products = shop.products.filter(name__icontains=keyword)
+            if price:
+                filtered_products = filtered_products.filter(price__lte=price)
+
+            if filtered_products.exists():
+                serialized_shop = ShopSerializer(shop).data
+                serialized_shop['products'] = ProductSerializer(filtered_products, many=True).data
+                data.append(serialized_shop)
+
+        return Response(data)
 
 class ProductListView(APIView):
     
